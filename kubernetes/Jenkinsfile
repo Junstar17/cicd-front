@@ -40,6 +40,7 @@ podTemplate(label: label, containers: [
 			}
 		}
 		// #3 Sonarqube 정적분석 Stage
+		/*
 		stage('Static Code Analysis') {
 			container('scanner') {
 				sh "sonar-scanner \
@@ -49,6 +50,7 @@ podTemplate(label: label, containers: [
 					-Dsonar.host.url=${sonarQubeURL}"
 			}
 		}
+		*/
 		// #4 컨테이너 이미지 생성 Stage
 		stage('Dockerizing') {
 			container('docker') {
