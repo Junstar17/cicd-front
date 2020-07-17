@@ -1,34 +1,34 @@
 def label = "worker-${UUID.randomUUID().toString()}"
 // Slack 알림
 podTemplate(label: label, containers: [
-  containerTemplate(name: 'npm', image: 'node:lts', command: 'cat', ttyEnabled: true),
+	containerTemplate(name: 'npm', image: 'node:lts', command: 'cat', ttyEnabled: true),
   //containerTemplate(name: 'gradle', image: 'gradle:4.5.1-jdk8', command: 'cat', ttyEnabled: true),
   //containerTemplate(name: 'maven', image: 'maven:3.3.9-jdk-8-alpine', ttyEnabled: true, command: 'cat'),
-  containerTemplate(name: "scanner", image: "newtmitch/sonar-scanner", ttyEnabled: true, command: "cat"),
-  containerTemplate(name: 'docker', image: 'docker:dind', command: 'dockerd --host=unix:///var/run/docker.sock --host=tcp://0.0.0.0:2375 --storage-driver=overlay', ttyEnabled: true, alwaysPullImage: true, privileged: true),
-  containerTemplate(name: 'kubectl', image: 'roffe/kubectl', command: 'cat', ttyEnabled: true)
+	containerTemplate(name: "scanner", image: "newtmitch/sonar-scanner", ttyEnabled: true, command: "cat"),
+	containerTemplate(name: 'docker', image: 'docker:dind', command: 'dockerd --host=unix:///var/run/docker.sock --host=tcp://0.0.0.0:2375 --storage-driver=overlay', ttyEnabled: true, alwaysPullImage: true, privileged: true),
+	containerTemplate(name: 'kubectl', image: 'roffe/kubectl', command: 'cat', ttyEnabled: true)
 ]) {
-  node(label) {
+	node(label) {
 	// 예외처리 구문
 	try {
 		// Slack - 빌드 시작시
 		// #0 Github 소스 가져오기
 		stage('Get Source') {
 			git credentialsId: 'github-lab40', url: 'https://github.com/Junstar17/cicd-front.git', branch: 'master'
-	    }
+		}
         // #1 Properties 파일 읽기
-    	def props = readProperties  file:"./kubernetes/pipeline.properties"
-    	def tag = props["version"]
-    	def dockerRegistry = props["dockerRegistry"]
-    	def credentialRegistry=props["credentialRegistry"]
-    	def image = props["image"]
-    	def appname = props["appname"]
-    	def containername = props["containerName"]
-    	def deployment = props["deployment"]
-    	def service = props["service"]
-    	def namespace = props["namespace"]
-    	def sonarQubeURL = props["sonarQubeURL"]
-    	def sonarQubeProject = props["sonarQubeProject"]
+		def props = readProperties  file:"./kubernetes/pipeline.properties"
+		def tag = props["version"]
+		def dockerRegistry = props["dockerRegistry"]
+		def credentialRegistry=props["credentialRegistry"]
+		def image = props["image"]
+		def appname = props["appname"]
+		def containername = props["containerName"]
+		def deployment = props["deployment"]
+		def service = props["service"]
+		def namespace = props["namespace"]
+		def sonarQubeURL = props["sonarQubeURL"]
+		def sonarQubeProject = props["sonarQubeProject"]
         // 재배포를 위한 tag를 재정의
         def timeStamp = System.currentTimeMillis()
         echo "TimeStamp: ${timeStamp}"
@@ -64,15 +64,15 @@ podTemplate(label: label, containers: [
 		}
 		// #5 배포 Stage
 		stage('Deploy') {
-      		container('kubectl') {
+			container('kubectl') {
 				sh "kubectl apply -n ${namespace} -f ${deployment}"
 				sh "kubectl apply -n ${namespace} -f ${service}"
 				sh "kubectl get svc -n ${namespace}"
-      		}
-    	}
+		}	
+	}
 		// Slack - 빌드 성공시
 	} catch(e) {
 		// Slack - 빌드 실패시
 	}
-  }
+}
 }
