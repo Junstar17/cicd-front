@@ -1,5 +1,5 @@
 def label = "worker-${UUID.randomUUID().toString()}"
-// Slack 알림
+// Slack 알림 test
 podTemplate(label: label, containers: [
 	containerTemplate(name: 'npm', image: 'node:lts', command: 'cat', ttyEnabled: true),
   //containerTemplate(name: 'gradle', image: 'gradle:4.5.1-jdk8', command: 'cat', ttyEnabled: true),
