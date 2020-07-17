@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend-lab23
+  name: frontend-lab40
   labels:
-    app: frontend-lab23
+    app: frontend-lab40
 spec:
   selector:
     matchLabels:
-      app: frontend-lab23
+      app: frontend-lab40
   replicas: 1
   template:
     metadata:
       labels:
-        app: frontend-lab23
+        app: frontend-lab40
     spec:
       containers:
-        - name: frontend-lab23
+        - name: frontend-lab40
           image: j931018/front-service
           imagePullPolicy: Always
           ports:

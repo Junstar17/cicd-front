@@ -14,7 +14,7 @@ podTemplate(label: label, containers: [
 		// Slack - 빌드 시작시
 		// #0 Github 소스 가져오기
 		stage('Get Source') {
-			git credentialsId: 'github-lab23', url: 'https://github.com/Junstar17/cicd-front.git', branch: 'master'
+			git credentialsId: 'github-lab40', url: 'https://github.com/Junstar17/cicd-front.git', branch: 'master'
 	    }
         // #1 Properties 파일 읽기
     	def props = readProperties  file:"./kubernetes/pipeline.properties"
@@ -40,17 +40,17 @@ podTemplate(label: label, containers: [
 			}
 		}
 		// #3 Sonarqube 정적분석 Stage
-		/*
+		
 		stage('Static Code Analysis') {
 			container('scanner') {
 				sh "sonar-scanner \
-					-Dsonar.projectKey=${sonarQubeProject} \
 					-Dsonar.projectName=${sonarQubeProject} \
-					-Dsonar.projectBaseDir=./ \
-					-Dsonar.host.url=${sonarQubeURL}"
+					-Dsonar.host.url=${sonarQubeURL} \
+					-Dsonar.projectBaseDir=./"
+					
 			}
 		}
-		*/
+		
 		// #4 컨테이너 이미지 생성 Stage
 		stage('Dockerizing') {
 			container('docker') {
@@ -67,7 +67,6 @@ podTemplate(label: label, containers: [
       		container('kubectl') {
 				sh "kubectl apply -n ${namespace} -f ${deployment}"
 				sh "kubectl apply -n ${namespace} -f ${service}"
-				sh "kubectl set image deployment ${appname} ${containername}=${image}:${tag} -n ${namespace}"
 				sh "kubectl get svc -n ${namespace}"
       		}
     	}
