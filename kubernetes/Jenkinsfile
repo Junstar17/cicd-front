@@ -1,4 +1,5 @@
 def label = "worker-${UUID.randomUUID().toString()}"
+def notifySlack(STATUS, COLOR) {slackSend channel: '#{{jenkins-alarm-test2}}', message: STATUS+" : " + "${env.JOB_NAME}[${env.BUILD_NUMBER}] (${env.BUILD_URL})", color: COLOR, tokenCredentialId: '{{Slack-lab40}}', teamDomain: '{{ibm-teck}}'}
 // Slack 알림 test
 podTemplate(label: label, containers: [
 	containerTemplate(name: 'npm', image: 'node:lts', command: 'cat', ttyEnabled: true),
@@ -12,6 +13,7 @@ podTemplate(label: label, containers: [
 	// 예외처리 구문
 	try {
 		// Slack - 빌드 시작시
+		notifySlack("STARTED", "#0000FF")
 		// #0 Github 소스 가져오기
 		stage('Get Source') {
 			git credentialsId: 'github-lab40', url: 'https://github.com/Junstar17/cicd-front.git', branch: 'master'
@@ -31,6 +33,7 @@ podTemplate(label: label, containers: [
 		def sonarQubeProject = props["sonarQubeProject"]
         // 재배포를 위한 tag를 재정의
         def timeStamp = System.currentTimeMillis()
+		
         echo "TimeStamp: ${timeStamp}"
         tag = tag+"-"+timeStamp
 		// #2 빌드 Stage
@@ -71,8 +74,10 @@ podTemplate(label: label, containers: [
 		}	
 	}
 		// Slack - 빌드 성공시
+		notifySlack("SUCCESS", "#00FF00")
 	} catch(e) {
 		// Slack - 빌드 실패시
+		notifySlack("FAILED", "#FF0000")
 	}
 }
 }
